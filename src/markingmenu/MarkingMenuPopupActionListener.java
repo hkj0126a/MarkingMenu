@@ -49,23 +49,24 @@ public class MarkingMenuPopupActionListener implements MouseListener {
         }
         timer.stop();
         if (e.getButton() == MouseEvent.BUTTON3) {
-            ArcProgressPane ap = new ArcProgressPane();
-            ap.setFillProgress(true);
-            ap.setProgress(0.36f);
-            ap.setForeground(Color.blue);
-            ap.setBorder(BorderFactory.createLineBorder(Color.red));
+//            ArcProgressPane ap = new ArcProgressPane();
+//            ap.setFillProgress(true);
+//            ap.setProgress(0.36f);
+//            ap.setForeground(Color.blue);
+//            ap.setBorder(BorderFactory.createLineBorder(Color.red));
+            Pie pie = new Pie();
             PopupFactory factory = PopupFactory.getSharedInstance();
 
-            int x = e.getXOnScreen() - (ap.getPreferredSize().width/2);
-            int y = e.getYOnScreen() - (ap.getPreferredSize().height/2);
+            int x = e.getXOnScreen() - (pie.getPreferredSize().width/2);
+            int y = e.getYOnScreen() - (pie.getPreferredSize().height/2);
 
-            popup = factory.getPopup(component, ap, x, y);
+            popup = factory.getPopup(component, pie, x, y);
             popup.show();
 
             timer.restart();
 
             MouseListener mouseHider = new MouseListenerHiderImpl();
-            ap.addMouseListener(mouseHider);
+            pie.addMouseListener(mouseHider);
         }
     }
 

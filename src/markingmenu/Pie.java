@@ -9,6 +9,8 @@ import autresProjets.ArcProgressPane;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Random;
 
 /**
@@ -39,8 +41,31 @@ public class Pie extends javax.swing.JPanel {
             Color c = new Color(rouge, vert, bleu);
             app = new ArcProgressPane(c, i, nbOptions);
             add(app);       
-            app.setPreferredSize(new Dimension(100,100));
-            app.setVisible(true);
+            app.addMouseListener(new MouseListener() {
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    ArcProgressPane src = (ArcProgressPane) e.getSource();
+                    System.out.println("click sur " + src.getPos());
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                }
+            });
+            
         }        
     }
 
