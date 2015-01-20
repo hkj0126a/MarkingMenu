@@ -69,7 +69,7 @@ public class ArcProgressPane extends JPanel {
     public void initAngle() {
         angle = (float) (2 * Math.PI / nbOptionsTotal);
         setProgress((float) (angle / (2 * Math.PI)));
-        angle *= position;
+        angle *= position - 1;
     }
 
     public void setFillProgress(boolean value) {
@@ -163,9 +163,9 @@ public class ArcProgressPane extends JPanel {
 
     private Point rotatePoint(Point p) {
         Point center = new Point(getWidth() / 2, getHeight() / 2);
-        int x = (int) (((p.x-center.x) * Math.cos(angle)) + ((p.y-center.y) * Math.sin(angle)));
-        int y = (int) (((p.y-center.y) * Math.cos(angle)) - ((p.x-center.x) * Math.sin(angle)));
-        Point rotatedPoint = new Point(x + center.x , y + center.y);
+        int x = (int) (((p.x - center.x) * Math.cos(angle)) + ((p.y - center.y) * Math.sin(angle)));
+        int y = (int) (((p.y - center.y) * Math.cos(angle)) - ((p.x - center.x) * Math.sin(angle)));
+        Point rotatedPoint = new Point(x + center.x, y + center.y);
         return rotatedPoint;
 
     }

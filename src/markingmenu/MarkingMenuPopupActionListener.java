@@ -45,7 +45,7 @@ public class MarkingMenuPopupActionListener implements MouseListener {
         }
 //        timer.stop();
         if (e.getButton() == MouseEvent.BUTTON3) {
-            Pie pie = new Pie();
+            Pie pie = new Pie(6);
             PopupFactory factory = PopupFactory.getSharedInstance();
 
             int x = e.getXOnScreen() - (pie.getPreferredSize().width/2);
