@@ -5,10 +5,7 @@
  */
 package markingmenu;
 
-import autresProjets.ArcProgressPane;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Random;
@@ -32,41 +29,12 @@ public class Pie extends javax.swing.JPanel {
         initComponents();
         nbOptions = nbO;
         ArcProgressPane app;
-        Random r = new Random();
 
         for (int i = 1; i <= nbOptions; i++) {
-            int rouge = r.nextInt(255);
-            int vert = r.nextInt(255);
-            int bleu = r.nextInt(255);
-            Color c = new Color(rouge, vert, bleu);
+            Color c = getRandomColor();
             app = new ArcProgressPane(c, i, nbOptions);
-            add(app);       
-            app.addMouseListener(new MouseListener() {
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    ArcProgressPane src = (ArcProgressPane) e.getSource();
-                    System.out.println("click sur " + src.getPos());
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                }
-            });
-            
-        }        
+            add(app);
+        }
     }
 
     /**
@@ -78,19 +46,19 @@ public class Pie extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                formMouseClicked(evt);
-            }
-        });
+        setOpaque(false);
         setLayout(new javax.swing.OverlayLayout(this));
     }// </editor-fold>//GEN-END:initComponents
-
-    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        System.out.println("fond");
-    }//GEN-LAST:event_formMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+    private Color getRandomColor() {
+        Random r = new Random();
+        int rouge = r.nextInt(255);
+        int vert = r.nextInt(255);
+        int bleu = r.nextInt(255);
+
+        return new Color(rouge, vert, bleu);
+    }
 }

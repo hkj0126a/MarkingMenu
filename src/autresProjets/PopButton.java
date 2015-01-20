@@ -5,6 +5,7 @@
  */
 package autresProjets;
 
+import markingmenu.ArcProgressPane;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

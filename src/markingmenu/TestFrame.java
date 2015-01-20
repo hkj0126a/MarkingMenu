@@ -32,7 +32,6 @@ public class TestFrame {
                 frame.setSize(800, 800);
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true); 
-//                frame.add(new Pie(6));
                
                 MouseListener markingPopupActionListener = new MarkingMenuPopupActionListener(frame);
                 frame.addMouseListener(markingPopupActionListener);

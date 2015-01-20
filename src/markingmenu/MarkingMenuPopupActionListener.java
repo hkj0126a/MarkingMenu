@@ -5,15 +5,11 @@
  */
 package markingmenu;
 
-import autresProjets.TicTacToeItem;
-import autresProjets.ArcProgressPane;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.BorderFactory;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.Timer;
@@ -39,7 +35,7 @@ public class MarkingMenuPopupActionListener implements MouseListener {
             popup.hide();
         };
         // Hide popup in 3 seconds
-        timer = new Timer(3000, hider);
+//        timer = new Timer(3000, hider);
     }
 
     @Override
@@ -47,13 +43,8 @@ public class MarkingMenuPopupActionListener implements MouseListener {
         if (popup != null) {
             popup.hide();
         }
-        timer.stop();
+//        timer.stop();
         if (e.getButton() == MouseEvent.BUTTON3) {
-//            ArcProgressPane ap = new ArcProgressPane();
-//            ap.setFillProgress(true);
-//            ap.setProgress(0.36f);
-//            ap.setForeground(Color.blue);
-//            ap.setBorder(BorderFactory.createLineBorder(Color.red));
             Pie pie = new Pie();
             PopupFactory factory = PopupFactory.getSharedInstance();
 
@@ -62,11 +53,11 @@ public class MarkingMenuPopupActionListener implements MouseListener {
 
             popup = factory.getPopup(component, pie, x, y);
             popup.show();
-
-            timer.restart();
+            
+//            timer.restart();
 
             MouseListener mouseHider = new MouseListenerHiderImpl();
-            pie.addMouseListener(mouseHider);
+            pie.addMouseListener(mouseHider);            
         }
     }
 

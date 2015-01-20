@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package autresProjets;
+package markingmenu;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -13,7 +13,10 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Point2D;
 import javax.swing.JPanel;
 
 public class ArcProgressPane extends JPanel {
@@ -26,23 +29,46 @@ public class ArcProgressPane extends JPanel {
     private Arc2D arc;
 
     public ArcProgressPane() {
-        this(Color.orange, 1,4);
+        this(Color.orange, 1, 4);
     }
-    
+
     public ArcProgressPane(Color c, int pos, int nbOptions) {
         this.setOpaque(false);
         setBackground(new Color(213, 134, 145, 120));
         setForeground(c);
-        nbOptionsTotal = nbOptions;        
+        nbOptionsTotal = nbOptions;
         position = pos;
         arc = new Arc2D.Double();
         initAngle();
-        setFillProgress(true);       
+        setFillProgress(true);
+        addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("click sur " + pos);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
     }
-    
+
     public void initAngle() {
         angle = (float) (2 * Math.PI / nbOptionsTotal);
-        setProgress((float) (angle/(2*Math.PI)));
+        setProgress((float) (angle / (2 * Math.PI)));
         angle *= position;
     }
 
@@ -80,25 +106,23 @@ public class ArcProgressPane extends JPanel {
 //        super.paint(g);
 //
 //    }
-
     public int getPos() {
         return position;
     }
-    
-    @Override
-    public boolean contains(Point p) {
-        return arc.contains(p);
-    }
+//
+//    @Override
+//    public boolean contains(Point p) {
+//        Point rotatedPoint = rotatePoint(p);
+//        System.out.println("Vérifie " + p.x + " " + p.y + " avec " + rotatedPoint.x + " " + rotatedPoint.y);
+//        return arc.contains(rotatedPoint);
+//    }
 
     @Override
     public boolean contains(int x, int y) {
-        return arc.contains(x, y);
+        Point rotatedPoint = rotatePoint(new Point(x, y));
+        return arc.contains(rotatedPoint.x, rotatedPoint.y);
     }
-    
-    
-    
-    
-    //Faire un contains pour le picking
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -135,5 +159,14 @@ public class ArcProgressPane extends JPanel {
         }
         g2d.fill(arc);
         g2d.dispose();
+    }
+
+    private Point rotatePoint(Point p) {
+        Point center = new Point(getWidth() / 2, getHeight() / 2);
+        int x = (int) (((p.x-center.x) * Math.cos(angle)) + ((p.y-center.y) * Math.sin(angle)));
+        int y = (int) (((p.y-center.y) * Math.cos(angle)) - ((p.x-center.x) * Math.sin(angle)));
+        Point rotatedPoint = new Point(x + center.x , y + center.y);
+        return rotatedPoint;
+
     }
 }
