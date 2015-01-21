@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 
 /*
  METTRE DES LISTENER SUR LE CLIC ET ASSOCIER UNE ACTION A UN ITEM
- implémente mouse hover pour le highlight
+ implémente mouse hover pour le highlight --> Stock la couleur et la change avec un peu plus pale
  */
 public class MarkingMenuItem extends JPanel {
 

@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,7 +23,7 @@ import markingmenu.MarkingMenu;
 
 public class Test {
 
-    private Popup popup;
+    private MarkingMenu markingMenu;
     private JFrame frame;
 
     public static void main(String[] args) {
@@ -39,6 +40,8 @@ public class Test {
                 }
 
                 initJFrame();
+                markingMenu = new MarkingMenu();
+
                 JLabel jLabel = new JLabel("JLABEL");
                 jLabel.setLocation(200, 200);
                 JPanel panel = new JPanel();
@@ -48,39 +51,32 @@ public class Test {
                     @Override
                     public void mouseClicked(MouseEvent e) {
 
-                        if (popup != null) {
-                            popup.hide();
-                        }
-                        if (e.getButton() == MouseEvent.BUTTON3) {                            
+                        if (e.getButton() == MouseEvent.BUTTON3) {
                             List<String> actions = new ArrayList();
                             actions.add("Color");
                             actions.add("Position");
                             actions.add("Text");
-                            MarkingMenu pie = new MarkingMenu(actions);
-                            PopupFactory factory = PopupFactory.getSharedInstance();
-
-                            int x = e.getXOnScreen() - (pie.getPreferredSize().width / 2);
-                            int y = e.getYOnScreen() - (pie.getPreferredSize().height / 2);
-
-                            popup = factory.getPopup(frame, pie, x, y);
-                            popup.show();
-
-                            pie.addMarkingMenuItemClick((int position) -> {
-                                System.out.println("ITEM CLICK" + position);
+                            //Crée la liste d'actions, MarkingMenu.setActions, execute
+//                            markingMenu = new MarkingMenu(actions);
+                            markingMenu.setListActions(actions, e.getXOnScreen(), e.getYOnScreen());
+                            markingMenu.addMarkingMenuItemClick((int position) -> {
+                                System.out.println("ITEM CLICK" + position + " State = " + markingMenu.getState());
 //                                jLabel.setText("POSITION " + position);
                                 //switch sur la position avec actions dans chaque case
+                                Random r = new Random();
                                 switch (position) {
                                     case 1:
-                                        jLabel.setForeground(Color.orange);
+                                        Color c = new Color(r.nextInt(126)+50, r.nextInt(126)+50, r.nextInt(126)+50);
+                                        jLabel.setForeground(c);
                                         break;
                                     case 2:
-                                        jLabel.setLocation(400, 400);
+                                        jLabel.setLocation(r.nextInt(500), r.nextInt(500));
                                         break;
                                     case 3:
-                                        jLabel.setText("Bonjour");
+                                        jLabel.setText(r.nextInt(500) + "");
                                         break;
                                 }
-                                popup.hide();
+                                //markingMenu.removeMarkingMenuItemClick(this);
                             });
                         }
                     }
