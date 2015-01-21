@@ -11,8 +11,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 
 /*
  METTRE DES LISTENER SUR LE CLIC ET ASSOCIER UNE ACTION A UN ITEM
-
+ implémente mouse hover pour le highlight
  */
 public class MarkingMenuItem extends JPanel {
 
@@ -32,12 +32,13 @@ public class MarkingMenuItem extends JPanel {
     private double angle;
     private Arc2D arc;
     private JLabel label;
+    private MarkingMenuItemListener observer;
 
-    public MarkingMenuItem() {
-        this(Color.orange, 1, 4, "Mon label");
-    }
+    /*public MarkingMenuItem() {
+        this(Color.orange, 1, 4, "Mon label",);
+    }*/
 
-    public MarkingMenuItem(Color c, int pos, int nbOptions, String _label) {
+    public MarkingMenuItem(Color c, int pos, int nbOptions, String _label,MarkingMenuItemListener obs) {
         setOpaque(false);
         setForeground(c);
         nbOptionsTotal = nbOptions;
@@ -46,87 +47,47 @@ public class MarkingMenuItem extends JPanel {
         label = new JLabel(_label);
         label.setOpaque(false);
         initAngle();
-        //add(label);
+        observer = obs;
 
+        add(label);
         setFillProgress(true);
-        addMouseListener(new MouseListener() {
-
+        addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("click sur " + pos);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
+               observer.actionMarkingMenuPerformed(position);
             }
         });
     }
 
-    private Point computeLabelLocation() {
-        label.setForeground(Color.black);
-
-        double x = getWidth() / 2;
-        double y = getHeight() / 4;
-
-        Point intermediaire = rotatePoint(new Point((int) x, (int) y), -angle);
-
-        double anglePart = (double) (2 * Math.PI / nbOptionsTotal);
-        Point presqueFinal = rotatePoint(intermediaire, -anglePart / 2);
-
-        presqueFinal.x -= label.getWidth() / 2;
-        presqueFinal.y -= label.getHeight() / 2;
-        return presqueFinal;
-    }
-
-    public void initAngle() {
+    private void initAngle() {
         angle = (double) (2 * Math.PI / nbOptionsTotal);
         setProgress((double) (angle / (2 * Math.PI)));
         angle *= position - 1;
     }
 
-    public void setFillProgress(boolean value) {
+    private void setFillProgress(boolean value) {
         if (fillProgress != value) {
             this.fillProgress = value;
             firePropertyChange("fillProgress", !fillProgress, fillProgress);
         }
     }
 
-    public boolean isFillProgress() {
+    private boolean isFillProgress() {
         return fillProgress;
     }
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(100, 100);
+        return new Dimension(200, 200);
     }
 
-    public void setProgress(double value) {
+    private void setProgress(double value) {
         if (progress != value) {
             double old = progress;
             this.progress = value;
             firePropertyChange("progress", old, progress);
             repaint();
         }
-    }
-
-    public double getProgress() {
-        return progress;
-    }
-
-    public int getPos() {
-        return position;
     }
 
     @Override
@@ -136,22 +97,21 @@ public class MarkingMenuItem extends JPanel {
     }
 
     /*@Override
-    public void setBounds(int x, int y, int width, int height) {
-        super.setBounds(x, y, width, height); //To change body of generated methods, choose Tools | Templates.
-        boolean add = false;
-        label.setLocation(computeLabelLocation());
+     public void setBounds(int x, int y, int width, int height) {
+     super.setBounds(x, y, width, height); //To change body of generated methods, choose Tools | Templates.
+     boolean add = false;
+     label.setLocation(computeLabelLocation());
 
-        for (int i = 0; i < getComponents().length; i++) {
-            if (getComponents()[i] == label) {
-                add = true;
-            }
-        }
+     for (int i = 0; i < getComponents().length; i++) {
+     if (getComponents()[i] == label) {
+     add = true;
+     }
+     }
 
-        if (!add) {
-            add(label);
-        }
-    }*/
-
+     if (!add) {
+     add(label);
+     }
+     }*/
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -191,6 +151,22 @@ public class MarkingMenuItem extends JPanel {
         label.setLocation(computeLabelLocation());
     }
 
+    private Point computeLabelLocation() {
+        label.setForeground(Color.black);
+
+        double x = getWidth() / 2;
+        double y = getHeight() / 4 - label.getHeight() / 2;
+
+        Point intermediaire = rotatePoint(new Point((int) x, (int) y), -angle);
+
+        double anglePart = (double) (2 * Math.PI / nbOptionsTotal);
+        Point presqueFinal = rotatePoint(intermediaire, -anglePart / 2);
+
+        presqueFinal.x -= label.getWidth() / 2;
+        presqueFinal.y -= label.getHeight() / 2;
+        return presqueFinal;
+    }
+
     private Point rotatePoint(Point p) {
         Point center = new Point(getWidth() / 2, getHeight() / 2);
         int x = (int) (((p.x - center.x) * Math.cos(angle)) + ((p.y - center.y) * Math.sin(angle)));
@@ -199,10 +175,10 @@ public class MarkingMenuItem extends JPanel {
         return rotatedPoint;
     }
 
-    private Point rotatePoint(Point p, double anglePart) {
+    private Point rotatePoint(Point p, double rotationAngle) {
         Point center = new Point(getWidth() / 2, getHeight() / 2);
-        int x = (int) (((p.x - center.x) * Math.cos(anglePart)) + ((p.y - center.y) * Math.sin(anglePart)));
-        int y = (int) (((p.y - center.y) * Math.cos(anglePart)) - ((p.x - center.x) * Math.sin(anglePart)));
+        int x = (int) (((p.x - center.x) * Math.cos(rotationAngle)) + ((p.y - center.y) * Math.sin(rotationAngle)));
+        int y = (int) (((p.y - center.y) * Math.cos(rotationAngle)) - ((p.x - center.x) * Math.sin(rotationAngle)));
         Point rotatedPoint = new Point(x + center.x, y + center.y);
         return rotatedPoint;
     }

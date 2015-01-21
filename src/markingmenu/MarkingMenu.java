@@ -10,17 +10,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import javax.swing.JFrame;
 
 /**
  *
  * @author hakje
  */
-public class MarkingMenu extends javax.swing.JPanel {
+public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemListener{
 
+    private JFrame myFrame;
+    private MarkingMenuState state;
+    private boolean isInMenu;
     private int nbOptions;
     private List<MarkingMenuItem> options;
     private List<String> labelOptions;
+    private List<MarkingMenuItemListener> observers;
     
+    
+
     /**
      * Creates new form Pie
      */
@@ -30,25 +37,29 @@ public class MarkingMenu extends javax.swing.JPanel {
 
     public MarkingMenu(List<String> label) {
         initComponents();
+        state = MarkingMenuState.IDLE;
+        isInMenu = false;
         options = new ArrayList();
         initMarkingMenu(label);
+        observers = new ArrayList<>();
     }
-    
-    public final void initMarkingMenu (List<String> label) {
+
+    public final void initMarkingMenu(List<String> label) {
         labelOptions = label;
-        nbOptions = labelOptions.size();
+        nbOptions = getLabelOptions().size();
         MarkingMenuItem app;
-        
+
         for (int i = 1; i <= nbOptions; i++) {
             Color c = getRandomColor();
-            app = new MarkingMenuItem(c, i, nbOptions,""+i);
+            app = new MarkingMenuItem(c, i, nbOptions, labelOptions.get(i-1),this);
             options.add(app);
             add(app);
         }
     }
     
-    public void setMarkingMenu (List<String> label) {
-        initMarkingMenu(label);
+    
+    public void addMarkingMenuItemClick(MarkingMenuItemListener itemClickListener) {
+        observers.add(itemClickListener);
     }
 
     /**
@@ -69,10 +80,51 @@ public class MarkingMenu extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
     private Color getRandomColor() {
         Random r = new Random();
-        int rouge = r.nextInt(126);
-        int vert = r.nextInt(126);
-        int bleu = r.nextInt(126);
+        int rouge = r.nextInt(128);
+        int vert = r.nextInt(128);
+        int bleu = r.nextInt(128);
 
-        return new Color(rouge+126, vert+126, bleu+126);
+        return new Color(rouge + 128, vert + 128, bleu + 128);
     }
+
+    public String getLabel(int numOption) {
+        return labelOptions.get(numOption);
+    }
+
+    public void setLabel(int numOption, String optionName) {
+        labelOptions.set(numOption, optionName);
+        initMarkingMenu(labelOptions);
+    }
+
+    public List<String> getLabelOptions() {
+        return labelOptions;
+    }
+
+    public void setMarkingMenu(List<String> label) {
+        initMarkingMenu(label);
+    }
+
+    public void updateState() {
+        switch (state) {
+            case MENU:
+                
+                break;
+            case IDLE:
+                break;
+            case MARKING:
+                break;
+            case VISIBLE:
+                break;
+            case INVISIBLE:
+                break;
+        }
+    }
+
+    @Override
+    public void actionMarkingMenuPerformed(int position) {
+        for (MarkingMenuItemListener obs : observers) {
+            obs.actionMarkingMenuPerformed(position);
+        }
+    }
+
 }
