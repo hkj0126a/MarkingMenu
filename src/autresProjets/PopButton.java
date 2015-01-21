@@ -5,7 +5,7 @@
  */
 package autresProjets;
 
-import markingmenu.ArcProgressPane;
+import markingmenu.MarkingMenuItem;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +31,7 @@ public class PopButton {
       button.setValueDisplayed(true);
       
       
-      ArcProgressPane ap = new ArcProgressPane();
+      MarkingMenuItem ap = new MarkingMenuItem();
       ap.setFillProgress(true);
       ap.setProgress(0.36f);
       

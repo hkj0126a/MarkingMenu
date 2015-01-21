@@ -5,19 +5,20 @@
  */
 package markingmenu;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.MouseListener;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class TestFrame {
+public class Test {
 
     public static void main(String[] args) {
-        new TestFrame();
+        new Test();
     }
 
-    public TestFrame() {
+    public Test() {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -26,13 +27,7 @@ public class TestFrame {
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                 }
 
-                JFrame frame = new JFrame("Testing");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-                frame.setSize(800, 800);
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true); 
-               
+                JFrame frame = new WhiteFrame();               
                 MouseListener markingPopupActionListener = new MarkingMenuPopupActionListener(frame);
                 frame.addMouseListener(markingPopupActionListener);
                 

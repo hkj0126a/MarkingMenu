@@ -6,35 +6,49 @@
 package markingmenu;
 
 import java.awt.Color;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
  *
  * @author hakje
  */
-public class Pie extends javax.swing.JPanel {
+public class MarkingMenu extends javax.swing.JPanel {
 
     private int nbOptions;
-
+    private List<MarkingMenuItem> options;
+    private List<String> labelOptions;
+    
     /**
      * Creates new form Pie
      */
-    public Pie() {
-        this(4);
+    public MarkingMenu() {
+        this(Arrays.asList("one", "two", "three", "four", "five", "four", "five"));
     }
 
-    public Pie(int nbO) {
+    public MarkingMenu(List<String> label) {
         initComponents();
-        nbOptions = nbO;
-        ArcProgressPane app;
-
+        options = new ArrayList();
+        initMarkingMenu(label);
+    }
+    
+    public final void initMarkingMenu (List<String> label) {
+        labelOptions = label;
+        nbOptions = labelOptions.size();
+        MarkingMenuItem app;
+        
         for (int i = 1; i <= nbOptions; i++) {
             Color c = getRandomColor();
-            app = new ArcProgressPane(c, i, nbOptions);
+            app = new MarkingMenuItem(c, i, nbOptions,""+i);
+            options.add(app);
             add(app);
         }
+    }
+    
+    public void setMarkingMenu (List<String> label) {
+        initMarkingMenu(label);
     }
 
     /**
@@ -55,10 +69,10 @@ public class Pie extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
     private Color getRandomColor() {
         Random r = new Random();
-        int rouge = r.nextInt(255);
-        int vert = r.nextInt(255);
-        int bleu = r.nextInt(255);
+        int rouge = r.nextInt(126);
+        int vert = r.nextInt(126);
+        int bleu = r.nextInt(126);
 
-        return new Color(rouge, vert, bleu);
+        return new Color(rouge+126, vert+126, bleu+126);
     }
 }
