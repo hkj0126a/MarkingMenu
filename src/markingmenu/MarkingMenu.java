@@ -40,7 +40,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
      * Creates new form Pie
      */
     public MarkingMenu() {
-        this(Arrays.asList("one", "two", "three", "four", "five", "four", "five"));
+        this(Arrays.asList("one", "two", "three", "four", "five", "six", "seven"));
     }
 
     public MarkingMenu(List<String> label) {
@@ -51,14 +51,15 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
         initMarkingMenu(label);
         observers = new ArrayList<>();
         addMouseListener(new MouseMarkingMenuListener());
-        initFactory(0,0);
+        initFactory(0, 0);
+        popup.hide();
         initTimerHider();
     }
 
     public final void initMarkingMenu(List<String> label) {
         labelOptions = label;
         nbOptions = getLabelOptions().size();
-        options.clear();        
+        options.clear();
         MarkingMenuItem app;
 
         for (int i = 1; i <= nbOptions; i++) {
@@ -76,11 +77,23 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
         int y = posY - (getPreferredSize().height / 2);
 //        int x = e.getXOnScreen() - (getPreferredSize().width / 2);
 //        int y = e.getYOnScreen() - (getPreferredSize().height / 2);
-        if(popup != null) {
+        if (popup != null) {
             popup.hide();
-        }        
+        }
         popup = factory.getPopup(myFrame, this, x, y);
         popup.show();
+    }
+
+    public void show() {
+        if (popup != null) {
+            popup.show();
+        }
+    }
+
+    public void hide() {
+        if (popup != null) {
+            popup.hide();
+        }
     }
 
     public void addMarkingMenuItemClick(MarkingMenuItemListener itemClickListener) {
@@ -90,7 +103,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
     public void removeMarkingMenuItemClick(MarkingMenuItemListener itemClickListener) {
         observers.remove(itemClickListener);
     }
-    
+
     public MarkingMenuState getState() {
         return state;
     }
@@ -150,6 +163,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
 
     @Override
     public void actionMarkingMenuPerformed(int position) {
+        popup.hide();
         for (MarkingMenuItemListener obs : observers) {
             obs.actionMarkingMenuPerformed(position);
         }
