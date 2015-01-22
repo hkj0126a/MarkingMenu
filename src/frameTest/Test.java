@@ -47,6 +47,12 @@ public class Test {
                 JPanel panel = new JPanel();
                 panel.add(jLabel);
                 frame.add(panel);
+                frame.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        markingMenu.hide();
+                    }
+                });
                 jLabel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -66,7 +72,7 @@ public class Test {
                                 Random r = new Random();
                                 switch (position) {
                                     case 1:
-                                        Color c = new Color(r.nextInt(126)+50, r.nextInt(126)+50, r.nextInt(126)+50);
+                                        Color c = new Color(r.nextInt(126) + 50, r.nextInt(126) + 50, r.nextInt(126) + 50);
                                         jLabel.setForeground(c);
                                         break;
                                     case 2:
