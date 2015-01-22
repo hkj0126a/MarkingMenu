@@ -85,6 +85,14 @@ public class MarkingMenuItem extends JPanel {
             repaint();
         }
     }
+    
+    @Override
+    public String toString() {
+        return label.getText();
+    }
+    
+    
+    
 
     @Override
     public boolean contains(int x, int y) {

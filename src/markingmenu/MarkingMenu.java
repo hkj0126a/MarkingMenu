@@ -59,14 +59,19 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
     public final void initMarkingMenu(List<String> label) {
         labelOptions = label;
         nbOptions = getLabelOptions().size();
-        options.clear();
         MarkingMenuItem app;
+        
+        for (MarkingMenuItem item : options) {
+            remove(item);
+        }
+        options.clear();
 
         for (int i = 1; i <= nbOptions; i++) {
             Color c = getRandomColor();
             app = new MarkingMenuItem(c, i, nbOptions, labelOptions.get(i - 1), this);
             options.add(app);
             add(app);
+            app.repaint();
         }
     }
 
@@ -144,6 +149,10 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
     public void setListActions(List<String> label, int posX, int posY) {
         initMarkingMenu(label);
         initFactory(posX, posY);
+    }
+    
+    public List<MarkingMenuItem> getOptions() {
+        return options;
     }
 
     public void updateState(MouseEvent e) {

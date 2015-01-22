@@ -20,6 +20,7 @@ import javax.swing.PopupFactory;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import markingmenu.MarkingMenu;
+import markingmenu.MarkingMenuItem;
 
 public class Test {
 
@@ -64,7 +65,12 @@ public class Test {
                             actions.add("Text");
                             //Crée la liste d'actions, MarkingMenu.setActions, execute
 //                            markingMenu = new MarkingMenu(actions);
+                            
+                            
+                            
                             markingMenu.setListActions(actions, e.getXOnScreen(), e.getYOnScreen());
+                                                   
+                            
                             markingMenu.addMarkingMenuItemClick((int position) -> {
                                 System.out.println("ITEM CLICK" + position + " State = " + markingMenu.getState());
 //                                jLabel.setText("POSITION " + position);
