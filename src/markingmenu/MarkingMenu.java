@@ -215,11 +215,9 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
     }
 
     private boolean isSameOptions(List<String> labels) {
-        System.out.println("LABEL SIZE : "+ (labels.size() == options.size()) );
         if (labels.size() == options.size()) {
             for (int i = 0; i < options.size(); i++) {
-                System.out.println(labels.get(i)+" vs "+options.get(i));
-                if(!labels.get(i).equals(options.get(i))) {
+                if(!labels.get(i).equals(options.get(i).toString())) {
                     return false;
                 }
             }
