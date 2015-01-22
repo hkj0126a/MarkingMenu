@@ -56,23 +56,27 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
         initTimerHider();
     }
 
-    public final void initMarkingMenu(List<String> label) {
-        labelOptions = label;
-        nbOptions = getLabelOptions().size();
-        MarkingMenuItem app;
-        
-        for (MarkingMenuItem item : options) {
-            remove(item);
-        }
-        options.clear();
+    public final void initMarkingMenu(List<String> labels) {
+        if (!isSameOptions(labels)) {
+            System.out.println("DIFFERENT DONC ON RECREE TOUT");
+            labelOptions = labels;
+            nbOptions = getLabelOptions().size();
+            MarkingMenuItem app;
 
-        for (int i = 1; i <= nbOptions; i++) {
-            Color c = getRandomColor();
-            app = new MarkingMenuItem(c, i, nbOptions, labelOptions.get(i - 1), this);
-            options.add(app);
-            add(app);
-            app.repaint();
+            for (MarkingMenuItem item : options) {
+                remove(item);
+            }
+            options.clear();
+
+            for (int i = 1; i <= nbOptions; i++) {
+                Color c = getRandomColor();
+                app = new MarkingMenuItem(c, i, nbOptions, labelOptions.get(i - 1), this);
+                options.add(app);
+                add(app);
+                app.repaint();
+            }
         }
+
     }
 
     public void initFactory(int posX, int posY) {
@@ -150,7 +154,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
         initMarkingMenu(label);
         initFactory(posX, posY);
     }
-    
+
     public List<MarkingMenuItem> getOptions() {
         return options;
     }
@@ -208,6 +212,20 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
         };
         // Hide popup in 3 seconds
         // timer = new Timer(3000, timerAction);
+    }
+
+    private boolean isSameOptions(List<String> labels) {
+        System.out.println("LABEL SIZE : "+ (labels.size() == options.size()) );
+        if (labels.size() == options.size()) {
+            for (int i = 0; i < options.size(); i++) {
+                System.out.println(labels.get(i)+" vs "+options.get(i));
+                if(!labels.get(i).equals(options.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private class MouseMarkingMenuListener implements MouseMotionListener, MouseListener {

@@ -5,6 +5,7 @@
  */
 package markingmenu;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -12,6 +13,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -30,13 +32,14 @@ public class MarkingMenuItem extends JPanel {
     private int position;
     private int nbOptionsTotal;
     private double angle;
-    private Arc2D arc;
+    private Arc2D arc,arc2;
     private JLabel label;
+    private Color color;
     private MarkingMenuItemListener observer;
 
     public MarkingMenuItem(Color c, int pos, int nbOptions, String _label,MarkingMenuItemListener obs) {
         setOpaque(false);
-        setForeground(c);
+        setForeground(Color.white);
         nbOptionsTotal = nbOptions;
         position = pos;
         arc = new Arc2D.Double();
@@ -44,6 +47,7 @@ public class MarkingMenuItem extends JPanel {
         label.setOpaque(false);
         initAngle();
         observer = obs;
+        color = c;
 
         add(label);
         setFillProgress(true);
@@ -51,6 +55,21 @@ public class MarkingMenuItem extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                observer.actionMarkingMenuPerformed(position);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+               Color co = new Color(c.getRGB()+13);
+                
+                setForeground(c);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                Color co = new Color(c.getRGB()-13);
+                
+                setForeground(Color.white);
+                
             }
         });
     }
@@ -124,6 +143,7 @@ public class MarkingMenuItem extends JPanel {
         int w2 = getWidth() / 2;
         int h2 = getHeight() / 2;
         g2d.rotate(angle, w2, h2);
+        
         g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
@@ -132,6 +152,7 @@ public class MarkingMenuItem extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        
 
         Insets insets = getInsets();
         int width = getWidth() - (insets.left + insets.right);
@@ -141,16 +162,21 @@ public class MarkingMenuItem extends JPanel {
         int y = insets.right + ((height - raidus) / 2);
 
         double extent = 360d * progress;
-        g2d.setColor(getForeground());
 
+        g2d.setColor(getForeground());
+        
         arc = null;
         if (isFillProgress()) {
+            //arc = new Arc2D.Double(x, y, raidus, 500, 90, -extent, Arc2D.OPEN);
             arc = new Arc2D.Double(x, y, raidus, raidus, 90, -extent, Arc2D.PIE);
         } else {
             extent = 360 - extent;
-            arc = new Arc2D.Double(x, y, raidus, raidus, 90, extent, Arc2D.PIE);
+            arc = new Arc2D.Double(x, y, raidus, raidus, 90, extent, Arc2D.OPEN);
         }
+        
         g2d.fill(arc);
+        g2d.setColor(Color.black);
+        g2d.draw(arc);
         g2d.dispose();
         label.setLocation(computeLabelLocation());
     }
