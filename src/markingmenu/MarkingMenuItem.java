@@ -34,10 +34,6 @@ public class MarkingMenuItem extends JPanel {
     private JLabel label;
     private MarkingMenuItemListener observer;
 
-    /*public MarkingMenuItem() {
-        this(Color.orange, 1, 4, "Mon label",);
-    }*/
-
     public MarkingMenuItem(Color c, int pos, int nbOptions, String _label,MarkingMenuItemListener obs) {
         setOpaque(false);
         setForeground(c);
