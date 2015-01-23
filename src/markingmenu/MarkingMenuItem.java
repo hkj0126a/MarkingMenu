@@ -5,7 +5,6 @@
  */
 package markingmenu;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -13,18 +12,13 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-/*
- METTRE DES LISTENER SUR LE CLIC ET ASSOCIER UNE ACTION A UN ITEM
- implémente mouse hover pour le highlight --> Stock la couleur et la change avec un peu plus pale
- */
 public class MarkingMenuItem extends JPanel {
 
     private boolean fillProgress = false;
@@ -32,7 +26,7 @@ public class MarkingMenuItem extends JPanel {
     private int position;
     private int nbOptionsTotal;
     private double angle;
-    private Arc2D arc,arc2;
+    private Area area;
     private JLabel label;
     private Color color;
     private MarkingMenuItemListener observer;
@@ -42,7 +36,7 @@ public class MarkingMenuItem extends JPanel {
         setForeground(Color.white);
         nbOptionsTotal = nbOptions;
         position = pos;
-        arc = new Arc2D.Double();
+        area = new Area();
         label = new JLabel(_label);
         label.setOpaque(false);
         initAngle();
@@ -116,7 +110,7 @@ public class MarkingMenuItem extends JPanel {
     @Override
     public boolean contains(int x, int y) {
         Point rotatedPoint = rotatePoint(new Point(x, y));
-        return arc.contains(rotatedPoint.x, rotatedPoint.y);
+        return area.contains(rotatedPoint.x, rotatedPoint.y);
     }
 
     /*@Override
@@ -164,7 +158,7 @@ public class MarkingMenuItem extends JPanel {
         double extent = 360d * progress;
 
         g2d.setColor(getForeground());
-        
+        Arc2D arc = new Arc2D.Double();
         arc = null;
         if (isFillProgress()) {
             //arc = new Arc2D.Double(x, y, raidus, 500, 90, -extent, Arc2D.OPEN);
@@ -174,9 +168,20 @@ public class MarkingMenuItem extends JPanel {
             arc = new Arc2D.Double(x, y, raidus, raidus, 90, extent, Arc2D.OPEN);
         }
         
-        g2d.fill(arc);
+        raidus /= 3;
+        x = insets.left + ((width - raidus) / 2);
+        y = insets.right + ((height - raidus) / 2);
+        Arc2D miniArc = new Arc2D.Double(x, y, raidus, raidus, 90, -extent, Arc2D.PIE);
+
+        area = new Area(arc);
+        Area miniArea = new Area(miniArc);
+        area.subtract(miniArea);
+        g2d.setColor(getForeground());
+        g2d.fill(area);
+        
         g2d.setColor(Color.black);
-        g2d.draw(arc);
+        g2d.draw(area);
+        
         g2d.dispose();
         label.setLocation(computeLabelLocation());
     }
