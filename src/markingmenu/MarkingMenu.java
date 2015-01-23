@@ -170,6 +170,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
 
     public void initState() {
         state = MarkingMenuState.IDLE;
+        removeMarkingMenuItemClick();
         hide();
     }
 
@@ -227,7 +228,15 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
     public void mouseMarkingMenuPressed(MouseEvent e) {
         switch (state) {
             case MENU:
-                //INTERDIT
+                if(e.getButton() == MouseEvent.BUTTON1) {
+                    state = MarkingMenuState.IDLE;
+                    hide();
+                } else if(e.getButton() == MouseEvent.BUTTON3){
+                    state = MarkingMenuState.MARKING;
+                    firstPoint.setLocation(e.getX(), e.getY());
+                    timer.start();
+                }
+                
                 break;
             case IDLE:
                 state = MarkingMenuState.MARKING;

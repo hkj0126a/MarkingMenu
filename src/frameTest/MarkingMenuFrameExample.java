@@ -23,71 +23,20 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         setResizable(false);
 
         markingMenu = new MarkingMenu();
-        
-        //listener init
+
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(markingMenu.isShowing()){
+                if (markingMenu.isShowing()) {
                     markingMenu.initState();
-        }}});
-        
+                }
+        }});
 
-        /*
-         * UTILISATION MARKING MENU
-         * 
-         * */
-        positionLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                positionLabelMousePressed(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                markingMenu.mouseMarkingMenuReleased(e,4);
-            }           
-        });
-        
-        positionLabel.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                markingMenu.mouseMarkingMenuDragged(e);
-            }
-        });
-
-        sizeLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                sizeLabelMouseClicked(e);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) { 
-                markingMenu.mouseMarkingMenuPressed(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                markingMenu.mouseMarkingMenuReleased(e,2);
-            }
-            
-        });
-
-        textLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                textLabelMouseClicked(e);
-            }
-        });
-
-        colorLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                colorLabelMouseClicked(e);
-            }
-        });
-
+        initPositionLabelListener();
+        initSizeLabelListener();
+        initTextLabelListener();
+        initColorLabelListener();
     }
 
     private void positionLabelMousePressed(MouseEvent e) {
@@ -103,7 +52,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
             markingMenu.addMarkingMenuItemClick((int position) -> {
                 int x = testLabel.getLocation().x;
                 int y = testLabel.getLocation().y;
-                
+
                 switch (position) {
                     case 1:
                         testLabel.setLocation(x + DELTA_MOVE_POSITION, y);
@@ -122,7 +71,8 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
             markingMenu.mouseMarkingMenuPressed(e);
         }
     }
-    private void textLabelMouseClicked(MouseEvent e) {
+
+    private void textLabelMousePresseed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             List<String> actions = new ArrayList();
             actions.add("Franças");
@@ -151,7 +101,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         }
     }
 
-    private void colorLabelMouseClicked(MouseEvent e) {
+    private void colorLabelMousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             List<String> actions = new ArrayList();
             actions.add("Rouge");
@@ -196,7 +146,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         }
     }
 
-    private void sizeLabelMouseClicked(MouseEvent e) {
+    private void sizeLabelMousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             List<String> actions = new ArrayList();
             actions.add("+2");
@@ -223,10 +173,10 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
                 // Set the label's font size to the newly determined size.
                 switch (position) {
                     case 1:
-                        testLabel.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse +2));
+                        testLabel.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse + 2));
                         break;
                     case 2:
-                        testLabel.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse -2));
+                        testLabel.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse - 2));
                         break;
                 }
             });
@@ -372,4 +322,93 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
     private javax.swing.JLabel testLabel;
     private javax.swing.JLabel textLabel;
     // End of variables declaration//GEN-END:variables
+
+    private void initPositionLabelListener() {
+        positionLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                positionLabelMousePressed(e);
+                markingMenu.mouseMarkingMenuPressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e, 4);
+            }
+        });
+
+        positionLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
+            }
+        });
+    }
+
+    private void initSizeLabelListener() {
+        sizeLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                sizeLabelMousePressed(e);
+                markingMenu.mouseMarkingMenuPressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e, 2);
+            }
+
+        });
+
+        sizeLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
+            }
+        });
+    }
+
+    private void initColorLabelListener() {
+        colorLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                colorLabelMousePressed(e);
+                markingMenu.mouseMarkingMenuPressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e, 8);
+            }
+        });
+        
+        colorLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
+            }
+        });
+    }
+
+    private void initTextLabelListener() {
+        textLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                textLabelMousePresseed(e);
+                markingMenu.mouseMarkingMenuPressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e, 4);
+            }
+        });
+        
+        textLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
+            }
+        });
+    }
 }
