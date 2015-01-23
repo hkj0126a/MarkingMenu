@@ -7,20 +7,21 @@ package frameTest;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import markingmenu.MarkingMenu;
-import markingmenu.MarkingMenuItem;
 
 public class Test {
 
@@ -44,16 +45,36 @@ public class Test {
                 markingMenu = new MarkingMenu();
 
                 JLabel jLabel = new JLabel("JLABEL");
-                jLabel.setLocation(200, 200);
+
                 JPanel panel = new JPanel();
+                panel.setLayout(new FlowLayout());
                 panel.add(jLabel);
                 frame.add(panel);
-                frame.addMouseListener(new MouseAdapter() {
+                jLabel.setLocation(500, 500);
+                panel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        System.out.println("CLICKED");
                         markingMenu.hide();
                     }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        System.out.println("PRESSED");
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        super.mouseReleased(e); //To change body of generated methods, choose Tools | Templates.
+                    }
                 });
+
+                panel.addMouseMotionListener(new MouseMotionAdapter() {
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        System.out.println("DRAGGED : "+e.getX()+" ; "+e.getY());
+                }});
+
                 jLabel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -65,12 +86,9 @@ public class Test {
                             actions.add("Text");
                             //Crée la liste d'actions, MarkingMenu.setActions, execute
 //                            markingMenu = new MarkingMenu(actions);
-                            
-                            
-                            
+
                             markingMenu.setListActions(actions, e.getXOnScreen(), e.getYOnScreen());
-                                                   
-                            
+
                             markingMenu.addMarkingMenuItemClick((int position) -> {
                                 System.out.println("ITEM CLICK" + position + " State = " + markingMenu.getState());
 //                                jLabel.setText("POSITION " + position);
@@ -104,4 +122,5 @@ public class Test {
         frame.setSize(500, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+
 }

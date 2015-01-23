@@ -5,7 +5,6 @@
  */
 package markingmenu;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -13,10 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -119,22 +116,6 @@ public class MarkingMenuItem extends JPanel {
         return arc.contains(rotatedPoint.x, rotatedPoint.y);
     }
 
-    /*@Override
-     public void setBounds(int x, int y, int width, int height) {
-     super.setBounds(x, y, width, height); //To change body of generated methods, choose Tools | Templates.
-     boolean add = false;
-     label.setLocation(computeLabelLocation());
-
-     for (int i = 0; i < getComponents().length; i++) {
-     if (getComponents()[i] == label) {
-     add = true;
-     }
-     }
-
-     if (!add) {
-     add(label);
-     }
-     }*/
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

@@ -230,6 +230,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemLi
 
         @Override
         public void mouseDragged(MouseEvent e) {
+            System.out.println("DRAG : "+e.getX());
 //            switch (state) {
 //                case MENU:
 //                    break;
