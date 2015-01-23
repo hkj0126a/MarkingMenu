@@ -62,22 +62,6 @@ public class MarkingMenuItem extends JPanel {
             public void mouseExited(MouseEvent e) {
                 observer.actionMarkingMenuItemExited(position,e);
             }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                System.out.println("MOVE ITEM : "+e.getX());
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                System.out.println("DRAG ITEM : "+e.getX());
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                System.out.println("released ITEM : "+e.getX());
-            }
-
         });
     }
 

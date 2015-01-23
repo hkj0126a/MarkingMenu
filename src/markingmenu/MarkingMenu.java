@@ -81,13 +81,11 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
 
     public void initFactory(int posX, int posY) {
         PopupFactory factory = PopupFactory.getSharedInstance();
-
         int x = posX - (getPreferredSize().width / 2);
         int y = posY - (getPreferredSize().height / 2);
 
         hide();
         popup = factory.getPopup(myFrame, this, x, y);
-        //show();
     }
 
     public void show() {
@@ -174,26 +172,6 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
         hide();
     }
 
-    public void updateState() {
-        switch (state) {
-            case MENU:
-                show();
-                break;
-            case IDLE:
-                hide();
-                break;
-            case MARKING:
-                hide();
-                break;
-            case VISIBLE:
-                show();
-                break;
-            case INVISIBLE:
-                hide();
-                break;
-        }
-    }
-
     private void timerListner() {
         switch (state) {
             case MENU:
@@ -207,19 +185,16 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
                 state = MarkingMenuState.VISIBLE;
                 timer.stop();
                 show();
-                //updateState();
                 break;
             case VISIBLE:
                 state = MarkingMenuState.VISIBLE;
-                //highlight();
-                //A3();
-                //A4();
+                show();
+                //do nothing
                 break;
             case INVISIBLE:
                 state = MarkingMenuState.INVISIBLE;
-                //highlight();
-                //A3();
-                //A4();
+                hide();
+                //do nothing
                 break;
         }
 
@@ -271,7 +246,6 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
             case VISIBLE:
                 if (isInMenu() != -1) {
                     state = MarkingMenuState.IDLE;
-                    //commande
                     fireObserversForItemAction(isInMenu());
                     hide();
                 } else {
@@ -282,7 +256,6 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
             case INVISIBLE:
                 if (computeIsInMenu(e, nbOptions) != -1) {
                     state = MarkingMenuState.IDLE;
-                    //commande();
                     fireObserversForItemAction(computeIsInMenu(e, nbOptions));
                     hide();
                 } else {
@@ -309,7 +282,8 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
                 //INTERDIT
                 break;
             case INVISIBLE:
-                //show();
+                state = MarkingMenuState.INVISIBLE;
+                //do nothing
                 break;
         }
     }

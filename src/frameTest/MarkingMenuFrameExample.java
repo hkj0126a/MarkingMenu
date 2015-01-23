@@ -78,7 +78,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
             actions.add("Franças");
             actions.add("Norvégien");
             actions.add("Bulgare");
-            actions.add("Chinois");
+            actions.add("Tibétain");
 
             markingMenu.setListActions(actions, e.getXOnScreen(), e.getYOnScreen());
 
@@ -94,7 +94,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
                         testLabel.setText("добър ден");
                         break;
                     case 4:
-                        testLabel.setText("你好");
+                        testLabel.setText("Tashi delek");
                         break;
                 }
             });
