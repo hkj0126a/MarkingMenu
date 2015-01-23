@@ -10,9 +10,7 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -22,10 +20,12 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import markingmenu.MarkingMenu;
+import markingmenu.MarkingMenuDragListener;
 
 public class Test {
 
     private MarkingMenu markingMenu;
+    private MarkingMenuDragListener dragListener;
     private JFrame frame;
 
     public static void main(String[] args) {
@@ -43,7 +43,7 @@ public class Test {
 
                 initJFrame();
                 markingMenu = new MarkingMenu();
-
+                dragListener = new MarkingMenuDragListener(markingMenu);
                 JLabel jLabel = new JLabel("JLABEL");
 
                 JPanel panel = new JPanel();
@@ -51,30 +51,23 @@ public class Test {
                 panel.add(jLabel);
                 frame.add(panel);
                 jLabel.setLocation(500, 500);
-                panel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        System.out.println("CLICKED");
-                        markingMenu.hide();
-                    }
 
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        System.out.println("PRESSED");
-                    }
+                /*
+                 ----------- LISTENER INIT
+                 */
+                frame.addMouseListener(dragListener);
+                frame.addMouseMotionListener(dragListener);
 
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        super.mouseReleased(e); //To change body of generated methods, choose Tools | Templates.
-                    }
-                });
+                panel.addMouseListener(dragListener);
+                panel.addMouseMotionListener(dragListener);
 
-                panel.addMouseMotionListener(new MouseMotionAdapter() {
-                    @Override
-                    public void mouseDragged(MouseEvent e) {
-                        System.out.println("DRAGGED : "+e.getX()+" ; "+e.getY());
-                }});
+                jLabel.addMouseListener(dragListener);
+                jLabel.addMouseMotionListener(dragListener);
 
+                /*
+                 * UTILISATION MARKING MENU
+                 * 
+                 * */
                 jLabel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -84,15 +77,12 @@ public class Test {
                             actions.add("Color");
                             actions.add("Position");
                             actions.add("Text");
-                            //Crée la liste d'actions, MarkingMenu.setActions, execute
-//                            markingMenu = new MarkingMenu(actions);
 
                             markingMenu.setListActions(actions, e.getXOnScreen(), e.getYOnScreen());
 
                             markingMenu.addMarkingMenuItemClick((int position) -> {
                                 System.out.println("ITEM CLICK" + position + " State = " + markingMenu.getState());
-//                                jLabel.setText("POSITION " + position);
-                                //switch sur la position avec actions dans chaque case
+
                                 Random r = new Random();
                                 switch (position) {
                                     case 1:
@@ -106,12 +96,12 @@ public class Test {
                                         jLabel.setText(r.nextInt(500) + "");
                                         break;
                                 }
+                                //markingMenu.show();
                                 //markingMenu.removeMarkingMenuItemClick(this);
                             });
                         }
                     }
                 });
-
             }
         });
     }

@@ -29,9 +29,9 @@ public class MarkingMenuItem extends JPanel {
     private Area area;
     private JLabel label;
     private Color color;
-    private MarkingMenuItemListener observer;
+    private MarkingMenuItemPrivateListener observer;
 
-    public MarkingMenuItem(Color c, int pos, int nbOptions, String _label,MarkingMenuItemListener obs) {
+    public MarkingMenuItem(Color c, int pos, int nbOptions, String _label, MarkingMenuItemPrivateListener obs) {
         setOpaque(false);
         setForeground(Color.white);
         nbOptionsTotal = nbOptions;
@@ -48,24 +48,28 @@ public class MarkingMenuItem extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-               observer.actionMarkingMenuPerformed(position);
+                observer.actionMarkingMenuClicked(position,e);
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-               Color co = new Color(c.getRGB()+13);
-                
-                setForeground(c);
+                observer.actionMarkingMenuItemEntered(position,e);
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                Color co = new Color(c.getRGB()-13);
-                
-                setForeground(Color.white);
-                
+                observer.actionMarkingMenuItemExited(position,e);
             }
         });
+    }
+
+    public void setHighLight(boolean isHighLight) {
+        if(isHighLight) {
+            setForeground(color);
+        }
+        else {
+            setForeground(Color.white);
+        }
     }
 
     private void initAngle() {
@@ -98,14 +102,11 @@ public class MarkingMenuItem extends JPanel {
             repaint();
         }
     }
-    
+
     @Override
     public String toString() {
         return label.getText();
     }
-    
-    
-    
 
     @Override
     public boolean contains(int x, int y) {
@@ -121,7 +122,7 @@ public class MarkingMenuItem extends JPanel {
         int w2 = getWidth() / 2;
         int h2 = getHeight() / 2;
         g2d.rotate(angle, w2, h2);
-        
+
         g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
@@ -130,7 +131,6 @@ public class MarkingMenuItem extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-        
 
         Insets insets = getInsets();
         int width = getWidth() - (insets.left + insets.right);
@@ -151,7 +151,7 @@ public class MarkingMenuItem extends JPanel {
             extent = 360 - extent;
             arc = new Arc2D.Double(x, y, raidus, raidus, 90, extent, Arc2D.OPEN);
         }
-        
+
         raidus /= 3;
         x = insets.left + ((width - raidus) / 2);
         y = insets.right + ((height - raidus) / 2);
@@ -162,10 +162,10 @@ public class MarkingMenuItem extends JPanel {
         area.subtract(miniArea);
         g2d.setColor(getForeground());
         g2d.fill(area);
-        
+
         g2d.setColor(Color.black);
         g2d.draw(area);
-        
+
         g2d.dispose();
         label.setLocation(computeLabelLocation());
     }
