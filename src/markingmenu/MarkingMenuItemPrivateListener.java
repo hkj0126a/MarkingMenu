@@ -13,7 +13,7 @@ import java.awt.event.MouseEvent;
  */
 public interface MarkingMenuItemPrivateListener {
 
-    public void actionMarkingMenuClicked(int position, MouseEvent e);
+    public void actionMarkingMenuItemClicked(int position, MouseEvent e);
 
     public void actionMarkingMenuItemEntered(int position, MouseEvent e);
 

@@ -1,15 +1,12 @@
 package frameTest;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import markingmenu.MarkingMenu;
-import markingmenu.MarkingMenuDragListener;
 
 /**
  *
@@ -32,7 +29,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(markingMenu.isShowing()){
-                    markingMenu.hide();
+                    markingMenu.initState();
         }}});
         
 
@@ -42,8 +39,20 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
          * */
         positionLabel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                positionLabelMouseClicked(e);
+            public void mousePressed(MouseEvent e) {
+                positionLabelMousePressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e,4);
+            }           
+        });
+        
+        positionLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
             }
         });
 
@@ -60,12 +69,8 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                int nbOptions = 2;
-                markingMenu.mouseMarkingMenuReleased(e,nbOptions);
+                markingMenu.mouseMarkingMenuReleased(e,2);
             }
-            
-            
-            
             
         });
 
@@ -85,7 +90,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
 
     }
 
-    private void positionLabelMouseClicked(MouseEvent e) {
+    private void positionLabelMousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             List<String> actions = new ArrayList();
             actions.add("A droite");
@@ -98,7 +103,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
             markingMenu.addMarkingMenuItemClick((int position) -> {
                 int x = testLabel.getLocation().x;
                 int y = testLabel.getLocation().y;
-
+                
                 switch (position) {
                     case 1:
                         testLabel.setLocation(x + DELTA_MOVE_POSITION, y);
@@ -113,11 +118,10 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
                         testLabel.setLocation(x, y - DELTA_MOVE_POSITION);
                         break;
                 }
-                //markingMenu.removeMarkingMenuItemClick(this);
             });
+            markingMenu.mouseMarkingMenuPressed(e);
         }
     }
-
     private void textLabelMouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             List<String> actions = new ArrayList();

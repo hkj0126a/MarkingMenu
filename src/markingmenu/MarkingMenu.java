@@ -8,10 +8,7 @@ package markingmenu;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,14 +27,14 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
     private JFrame myFrame;
     private MarkingMenuState state;
     private Popup popup;
-    private boolean isInMenu;
     private int nbOptions;
     private Timer timer;
-    private List<MarkingMenuItem> options;
+    private List<MarkingMenuItem> items;
     private List<String> labelOptions;
     private MarkingMenuItemListener observers;
     private Point firstPoint;
-    private Point secondPoint;
+    private final static int MARKING_MENU_RAYON = 100;
+    private final static int DELAT_ERROR = 30;
 
     /**
      * Creates new form Pie
@@ -49,15 +46,15 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
     public MarkingMenu(List<String> label) {
         initComponents();
         state = MarkingMenuState.IDLE;
-        isInMenu = false;
-        options = new ArrayList();
+        items = new ArrayList();
         initMarkingMenu(label);
         observers = null;
         initFactory(0, 0);
         firstPoint = new Point(0, 0);
-        secondPoint = new Point(0, 0);
-        popup.hide();
-        initTimerHider();
+        hide();
+        timer = new Timer(1000, (ActionEvent e) -> {
+            timerListner();
+        });
     }
 
     public final void initMarkingMenu(List<String> labels) {
@@ -66,15 +63,15 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
             nbOptions = getLabelOptions().size();
             MarkingMenuItem app;
 
-            for (MarkingMenuItem item : options) {
+            for (MarkingMenuItem item : items) {
                 remove(item);
             }
-            options.clear();
+            items.clear();
 
             for (int i = 1; i <= nbOptions; i++) {
                 Color c = getRandomColor();
                 app = new MarkingMenuItem(c, i, nbOptions, labelOptions.get(i - 1), this);
-                options.add(app);
+                items.add(app);
                 add(app);
                 app.repaint();
             }
@@ -90,7 +87,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
 
         hide();
         popup = factory.getPopup(myFrame, this, x, y);
-        show();
+        //show();
     }
 
     public void show() {
@@ -155,67 +152,76 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
         initFactory(posX, posY);
     }
 
-    public List<MarkingMenuItem> getOptions() {
-        return options;
-    }
-
-    public void updateState(MouseEvent e) {
-        switch (state) {
-            case MENU:
-                break;
-            case IDLE:
-                break;
-            case MARKING:
-                break;
-            case VISIBLE:
-                break;
-            case INVISIBLE:
-                break;
-        }
-    }
-
-    private void initTimerHider() {
-        ActionListener timerAction = (ActionEvent e1) -> {
-            switch (state) {
-                case MENU:
-                    state = MarkingMenuState.MENU;
-                    //highlight()
-                    break;
-                case IDLE:
-                    //INTERDIT
-                    break;
-                case MARKING:
-                    state = MarkingMenuState.VISIBLE;
-                    popup.show();
-                    break;
-                case VISIBLE:
-                    state = MarkingMenuState.VISIBLE;
-                    //highlight();
-                    //A3();
-                    //A4();
-                    break;
-                case INVISIBLE:
-                    state = MarkingMenuState.INVISIBLE;
-                    //highlight();
-                    //A3();
-                    //A4();
-                    break;
-            }
-        };
-        // Hide popup in 3 seconds
-        // timer = new Timer(3000, timerAction);
+    public List<MarkingMenuItem> getItems() {
+        return items;
     }
 
     private boolean isSameOptions(List<String> labels) {
-        if (labels.size() == options.size()) {
-            for (int i = 0; i < options.size(); i++) {
-                if (!labels.get(i).equals(options.get(i).toString())) {
+        if (labels.size() == items.size()) {
+            for (int i = 0; i < items.size(); i++) {
+                if (!labels.get(i).equals(items.get(i).toString())) {
                     return false;
                 }
             }
             return true;
         }
         return false;
+    }
+
+    public void initState() {
+        state = MarkingMenuState.IDLE;
+        hide();
+    }
+
+    public void updateState() {
+        switch (state) {
+            case MENU:
+                show();
+                break;
+            case IDLE:
+                hide();
+                break;
+            case MARKING:
+                hide();
+                break;
+            case VISIBLE:
+                show();
+                break;
+            case INVISIBLE:
+                hide();
+                break;
+        }
+    }
+
+    private void timerListner() {
+        switch (state) {
+            case MENU:
+                state = MarkingMenuState.MENU;
+                //highlight()
+                break;
+            case IDLE:
+                //INTERDIT
+                break;
+            case MARKING:
+                state = MarkingMenuState.VISIBLE;
+                timer.stop();
+                show();
+                //updateState();
+                break;
+            case VISIBLE:
+                state = MarkingMenuState.VISIBLE;
+                //highlight();
+                //A3();
+                //A4();
+                break;
+            case INVISIBLE:
+                state = MarkingMenuState.INVISIBLE;
+                //highlight();
+                //A3();
+                //A4();
+                break;
+        }
+
     }
 
     public void mouseMarkingMenuPressed(MouseEvent e) {
@@ -225,7 +231,8 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
                 break;
             case IDLE:
                 state = MarkingMenuState.MARKING;
-                //A1();
+                firstPoint.setLocation(e.getX(), e.getY());
+                timer.start();
                 break;
             case MARKING:
                 //INTERDIT
@@ -240,6 +247,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
     }
 
     public void mouseMarkingMenuReleased(MouseEvent e, int nbOptions) {
+        timer.stop();
         switch (state) {
             case MENU:
                 //INTERDIT
@@ -249,50 +257,115 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
                 break;
             case MARKING:
                 state = MarkingMenuState.MENU;
-                popup.show();
+                show();
                 break;
             case VISIBLE:
-                if (isInMenu) {
+                if (isInMenu() != -1) {
                     state = MarkingMenuState.IDLE;
-                    //commande();
-                    popup.hide();
+                    //commande
+                    fireObserversForItemAction(isInMenu());
+                    hide();
                 } else {
                     state = MarkingMenuState.IDLE;
-                    popup.hide();
+                    hide();
                 }
                 break;
             case INVISIBLE:
-                if (isInMenu) {
+                if (computeIsInMenu(e, nbOptions) != -1) {
                     state = MarkingMenuState.IDLE;
                     //commande();
-                    //A2();
+                    fireObserversForItemAction(computeIsInMenu(e, nbOptions));
+                    hide();
                 } else {
                     state = MarkingMenuState.IDLE;
-                    //A2();
+                    hide();
                 }
                 break;
         }
     }
 
-    @Override
-    public void actionMarkingMenuClicked(int position, MouseEvent e) {
-        popup.hide();
+    public void mouseMarkingMenuDragged(MouseEvent e) {
+        switch (state) {
+            case MENU:
+                //INTERDIT
+                break;
+            case IDLE:
+                //INTERDIT
+                break;
+            case MARKING:
+                state = MarkingMenuState.INVISIBLE;
+                timer.stop();
+                break;
+            case VISIBLE:
+                //INTERDIT
+                break;
+            case INVISIBLE:
+                //show();
+                break;
+        }
+    }
+
+    private void fireObserversForItemAction(int position) {
         if (observers != null) {
             observers.actionMarkingMenuPerformed(position);
+            items.get(position - 1).setHighLight(false);
             removeMarkingMenuItemClick();
         }
-        options.get(position - 1).setHighLight(false);
+        for (MarkingMenuItem item : items) {
+            item.setHighLight(false);
+        }
+    }
 
+    private int isInMenu() {
+        int pos = -1;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).isMouseIn()) {
+                return i + 1;
+            }
+        }
+        return pos;
+    }
+
+    private int computeIsInMenu(MouseEvent e, int nbOptions) {
+        int distance = (int) e.getPoint().distance(firstPoint);
+        Point origin = new Point(firstPoint.x, firstPoint.y - MARKING_MENU_RAYON);
+        double angleSection = 360 / nbOptions;
+        double angle = angleBetweenTwoPointsWithFixedPoint(e.getX(),e.getY(),origin.x, origin.y,firstPoint.x,firstPoint.y);
+        angle = Math.toDegrees(angle);
+
+        if (distance < MARKING_MENU_RAYON && distance > DELAT_ERROR) {
+            if(angle < 0) {
+                angle += 360;
+            }
+            return (int)((angle / angleSection)+1);
+        } else {
+            return -1;
+        }
+    }
+
+    public static double angleBetweenTwoPointsWithFixedPoint(double point1X, double point1Y,
+            double point2X, double point2Y,
+            double fixedX, double fixedY) {
+
+        double angle1 = Math.atan2(point1Y - fixedY, point1X - fixedX);
+        double angle2 = Math.atan2(point2Y - fixedY, point2X - fixedX);
+
+        return angle1 - angle2;
+    }
+
+    @Override
+    public void actionMarkingMenuItemClicked(int position, MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             switch (state) {
                 case MENU:
-                    if (isInMenu) {
+                    if (isInMenu() != -1) {
                         state = MarkingMenuState.IDLE;
-                        //commande(); appel a actionMarkingMenuPerformed?
-                        popup.hide();
+                        //commande
+                        fireObserversForItemAction(position);
+                        hide();
                     } else {
                         state = MarkingMenuState.IDLE;
-                        popup.hide();
+                        hide();
                     }
                     break;
                 case IDLE:
@@ -313,40 +386,14 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
 
     @Override
     public void actionMarkingMenuItemEntered(int position, MouseEvent e) {
-        switch (state) {
-            case IDLE:
-                break;
-            case MARKING:
-                break;
-            case VISIBLE:
-                break;
-            case INVISIBLE:
-                break;
-            case MENU:
-                break;
-            default:
-                throw new AssertionError(state.name());
-        }
-        options.get(position - 1).setHighLight(true);
+        items.get(position - 1).setMouseIn(true);
+        items.get(position - 1).setHighLight(true);
     }
 
     @Override
     public void actionMarkingMenuItemExited(int position, MouseEvent e) {
-        switch (state) {
-            case IDLE:
-                break;
-            case MARKING:
-                break;
-            case VISIBLE:
-                break;
-            case INVISIBLE:
-                break;
-            case MENU:
-                break;
-            default:
-                throw new AssertionError(state.name());
-        }
-        options.get(position - 1).setHighLight(false);
+        items.get(position - 1).setMouseIn(true);
+        items.get(position - 1).setHighLight(false);
     }
 
 }

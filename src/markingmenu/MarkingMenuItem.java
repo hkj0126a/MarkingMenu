@@ -29,6 +29,7 @@ public class MarkingMenuItem extends JPanel {
     private Area area;
     private JLabel label;
     private Color color;
+    private boolean isMouseIn = false;
     private MarkingMenuItemPrivateListener observer;
 
     public MarkingMenuItem(Color c, int pos, int nbOptions, String _label, MarkingMenuItemPrivateListener obs) {
@@ -42,13 +43,14 @@ public class MarkingMenuItem extends JPanel {
         initAngle();
         observer = obs;
         color = c;
+        
 
         add(label);
         setFillProgress(true);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                observer.actionMarkingMenuClicked(position,e);
+                observer.actionMarkingMenuItemClicked(position,e);
             }
 
             @Override
@@ -60,15 +62,33 @@ public class MarkingMenuItem extends JPanel {
             public void mouseExited(MouseEvent e) {
                 observer.actionMarkingMenuItemExited(position,e);
             }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                System.out.println("MOVE ITEM : "+e.getX());
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                System.out.println("DRAG ITEM : "+e.getX());
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                System.out.println("released ITEM : "+e.getX());
+            }
+
         });
     }
 
     public void setHighLight(boolean isHighLight) {
         if(isHighLight) {
             setForeground(color);
+            isMouseIn = true;
         }
         else {
             setForeground(Color.white);
+            isMouseIn = false;
         }
     }
 
@@ -101,6 +121,14 @@ public class MarkingMenuItem extends JPanel {
             firePropertyChange("progress", old, progress);
             repaint();
         }
+    }
+    
+    public void setMouseIn(boolean in) {
+        isMouseIn = in;
+    }
+    
+    public boolean isMouseIn() {
+        return isMouseIn;
     }
 
     @Override
