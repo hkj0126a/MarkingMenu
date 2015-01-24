@@ -176,7 +176,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
     private void textLabelMousePresseed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             List<String> actions = new ArrayList();
-            actions.add("Franças");
+            actions.add("Français");
             actions.add("Norvégien");
             actions.add("Bulgare");
             actions.add("Tibétain");
