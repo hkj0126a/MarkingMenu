@@ -9,8 +9,8 @@ import java.util.List;
 import markingmenu.MarkingMenu;
 
 /**
- *
- * @author nathan
+ * @author Nathan
+ * @author Jean-Luc
  */
 public class MarkingMenuFrameExample extends javax.swing.JFrame {
 
@@ -21,24 +21,125 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
     public MarkingMenuFrameExample() {
         initComponents();
         setResizable(false);
-
         markingMenu = new MarkingMenu();
 
-
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (markingMenu.isShowing()) {
-                    markingMenu.initState();
-                }
-        }});
-
+        initFrameListener();
         initPositionLabelListener();
         initSizeLabelListener();
         initTextLabelListener();
         initColorLabelListener();
     }
 
+    /**
+     * *****************************************************************************
+     *** INIT LISTENER METHODS
+     * ******************************************************************************
+     */
+    private void initPositionLabelListener() {
+        positionLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                positionLabelMousePressed(e);
+                markingMenu.mouseMarkingMenuPressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e, 4);
+            }
+        });
+
+        positionLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
+            }
+        });
+    }
+
+    private void initSizeLabelListener() {
+        sizeLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                sizeLabelMousePressed(e);
+                markingMenu.mouseMarkingMenuPressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e, 2);
+            }
+
+        });
+
+        sizeLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
+            }
+        });
+    }
+
+    private void initColorLabelListener() {
+        colorLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                colorLabelMousePressed(e);
+                markingMenu.mouseMarkingMenuPressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e, 8);
+            }
+        });
+
+        colorLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
+            }
+        });
+    }
+
+    private void initTextLabelListener() {
+        textLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                textLabelMousePresseed(e);
+                markingMenu.mouseMarkingMenuPressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                markingMenu.mouseMarkingMenuReleased(e, 4);
+            }
+        });
+
+        textLabel.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                markingMenu.mouseMarkingMenuDragged(e);
+            }
+        });
+    }
+
+    private void initFrameListener() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (markingMenu.isShowing()) {
+                    markingMenu.initState();
+                }
+            }
+        });
+    }
+
+    /**
+     * *****************************************************************************
+     *** LISTENER METHODS
+     * ******************************************************************************
+     */
     private void positionLabelMousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             List<String> actions = new ArrayList();
@@ -323,92 +424,4 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
     private javax.swing.JLabel textLabel;
     // End of variables declaration//GEN-END:variables
 
-    private void initPositionLabelListener() {
-        positionLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                positionLabelMousePressed(e);
-                markingMenu.mouseMarkingMenuPressed(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                markingMenu.mouseMarkingMenuReleased(e, 4);
-            }
-        });
-
-        positionLabel.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                markingMenu.mouseMarkingMenuDragged(e);
-            }
-        });
-    }
-
-    private void initSizeLabelListener() {
-        sizeLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                sizeLabelMousePressed(e);
-                markingMenu.mouseMarkingMenuPressed(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                markingMenu.mouseMarkingMenuReleased(e, 2);
-            }
-
-        });
-
-        sizeLabel.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                markingMenu.mouseMarkingMenuDragged(e);
-            }
-        });
-    }
-
-    private void initColorLabelListener() {
-        colorLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                colorLabelMousePressed(e);
-                markingMenu.mouseMarkingMenuPressed(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                markingMenu.mouseMarkingMenuReleased(e, 8);
-            }
-        });
-        
-        colorLabel.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                markingMenu.mouseMarkingMenuDragged(e);
-            }
-        });
-    }
-
-    private void initTextLabelListener() {
-        textLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                textLabelMousePresseed(e);
-                markingMenu.mouseMarkingMenuPressed(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                markingMenu.mouseMarkingMenuReleased(e, 4);
-            }
-        });
-        
-        textLabel.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                markingMenu.mouseMarkingMenuDragged(e);
-            }
-        });
-    }
 }

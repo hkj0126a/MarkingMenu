@@ -1,10 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package markingmenu;
 
+import markingmenu.listener.MarkingMenuItemExtendListener;
+import markingmenu.listener.MarkingMenuItemListener;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -19,10 +16,10 @@ import javax.swing.PopupFactory;
 import javax.swing.Timer;
 
 /**
- *
- * @author hakje
+ * @author Nathan
+ * @author Jean-Luc
  */
-public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPrivateListener {
+public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemExtendListener {
 
     private JFrame myFrame;
     private MarkingMenuState state;
@@ -45,18 +42,24 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
 
     public MarkingMenu(List<String> label) {
         initComponents();
-        state = MarkingMenuState.IDLE;
-        items = new ArrayList();
-        initMarkingMenu(label);
-        observers = null;
-        initFactory(0, 0);
+
         firstPoint = new Point(0, 0);
-        hide();
+        items = new ArrayList();
+        observers = null;
         timer = new Timer(1000, (ActionEvent e) -> {
             timerListner();
         });
+
+        initMarkingMenu(label);
+        initFactory(0, 0);
+        initState();
     }
 
+    /**
+     * *****************************************************************************
+     *** INITIALIZATION METHODS
+     * ******************************************************************************
+     */
     public final void initMarkingMenu(List<String> labels) {
         if (!isSameOptions(labels)) {
             labelOptions = labels;
@@ -88,6 +91,12 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
         popup = factory.getPopup(myFrame, this, x, y);
     }
 
+    public void initState() {
+        state = MarkingMenuState.IDLE;
+        removeMarkingMenuItemClick();
+        hide();
+    }
+
     public void show() {
         if (popup != null) {
             popup.show();
@@ -100,16 +109,17 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
         }
     }
 
+    /**
+     * *****************************************************************************
+     *** ADD / REMOVE OBSERVERS METHODS
+     * ******************************************************************************
+     */
     public void addMarkingMenuItemClick(MarkingMenuItemListener itemClickListener) {
         observers = itemClickListener;
     }
 
     public void removeMarkingMenuItemClick() {
         observers = null;
-    }
-
-    public MarkingMenuState getState() {
-        return state;
     }
 
     /**
@@ -128,13 +138,13 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-    private Color getRandomColor() {
-        Random r = new Random();
-        int rouge = r.nextInt(128);
-        int vert = r.nextInt(128);
-        int bleu = r.nextInt(128);
-
-        return new Color(rouge + 128, vert + 128, bleu + 128);
+    /**
+     * *****************************************************************************
+     *** GETTER / SETTER METHODS
+     * ******************************************************************************
+     */
+    public MarkingMenuState getState() {
+        return state;
     }
 
     public String getLabel(int numOption) {
@@ -154,24 +164,11 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
         return items;
     }
 
-    private boolean isSameOptions(List<String> labels) {
-        if (labels.size() == items.size()) {
-            for (int i = 0; i < items.size(); i++) {
-                if (!labels.get(i).equals(items.get(i).toString())) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public void initState() {
-        state = MarkingMenuState.IDLE;
-        removeMarkingMenuItemClick();
-        hide();
-    }
-
+    /**
+     * *****************************************************************************
+     *** LISTENER METHODS
+     * ******************************************************************************
+     */
     private void timerListner() {
         switch (state) {
             case MENU:
@@ -203,15 +200,15 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
     public void mouseMarkingMenuPressed(MouseEvent e) {
         switch (state) {
             case MENU:
-                if(e.getButton() == MouseEvent.BUTTON1) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
                     state = MarkingMenuState.IDLE;
                     hide();
-                } else if(e.getButton() == MouseEvent.BUTTON3){
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
                     state = MarkingMenuState.MARKING;
                     firstPoint.setLocation(e.getX(), e.getY());
                     timer.start();
                 }
-                
+
                 break;
             case IDLE:
                 state = MarkingMenuState.MARKING;
@@ -244,9 +241,9 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
                 show();
                 break;
             case VISIBLE:
-                if (isInMenu() != -1) {
+                if (isInItemMenu() != -1) {
                     state = MarkingMenuState.IDLE;
-                    fireObserversForItemAction(isInMenu());
+                    fireObserversForItemAction(isInItemMenu());
                     hide();
                 } else {
                     state = MarkingMenuState.IDLE;
@@ -254,9 +251,9 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
                 }
                 break;
             case INVISIBLE:
-                if (computeIsInMenu(e, nbOptions) != -1) {
+                if (computeIsInInvisibleMenu(e, nbOptions) != -1) {
                     state = MarkingMenuState.IDLE;
-                    fireObserversForItemAction(computeIsInMenu(e, nbOptions));
+                    fireObserversForItemAction(computeIsInInvisibleMenu(e, nbOptions));
                     hide();
                 } else {
                     state = MarkingMenuState.IDLE;
@@ -299,49 +296,17 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
         }
     }
 
-    private int isInMenu() {
-        int pos = -1;
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).isMouseIn()) {
-                return i + 1;
-            }
-        }
-        return pos;
-    }
-
-    private int computeIsInMenu(MouseEvent e, int nbOptions) {
-        int distance = (int) e.getPoint().distance(firstPoint);
-        Point origin = new Point(firstPoint.x, firstPoint.y - MARKING_MENU_RAYON);
-        double angleSection = 360 / nbOptions;
-        double angle = angleBetweenTwoPointsWithFixedPoint(e.getX(),e.getY(),origin.x, origin.y,firstPoint.x,firstPoint.y);
-        angle = Math.toDegrees(angle);
-
-        if (distance < MARKING_MENU_RAYON && distance > DELAT_ERROR) {
-            if(angle < 0) {
-                angle += 360;
-            }
-            return (int)((angle / angleSection)+1);
-        } else {
-            return -1;
-        }
-    }
-
-    public static double angleBetweenTwoPointsWithFixedPoint(double point1X, double point1Y,
-            double point2X, double point2Y,
-            double fixedX, double fixedY) {
-
-        double angle1 = Math.atan2(point1Y - fixedY, point1X - fixedX);
-        double angle2 = Math.atan2(point2Y - fixedY, point2X - fixedX);
-
-        return angle1 - angle2;
-    }
-
+    /**
+     * *****************************************************************************
+     *** OVERRIDE LISTENER METHODS
+     * ******************************************************************************
+     */
     @Override
     public void actionMarkingMenuItemClicked(int position, MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             switch (state) {
                 case MENU:
-                    if (isInMenu() != -1) {
+                    if (isInItemMenu() != -1) {
                         state = MarkingMenuState.IDLE;
                         //commande
                         fireObserversForItemAction(position);
@@ -377,6 +342,69 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemPr
     public void actionMarkingMenuItemExited(int position, MouseEvent e) {
         items.get(position - 1).setMouseIn(true);
         items.get(position - 1).setHighLight(false);
+    }
+
+    /**
+     * *****************************************************************************
+     *** COMPUTATION METHODS
+     * ******************************************************************************
+     */
+    private int isInItemMenu() {
+        int pos = -1;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).isMouseIn()) {
+                return i + 1;
+            }
+        }
+        return pos;
+    }
+
+    private boolean isSameOptions(List<String> labels) {
+        if (labels.size() == items.size()) {
+            for (int i = 0; i < items.size(); i++) {
+                if (!labels.get(i).equals(items.get(i).toString())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private int computeIsInInvisibleMenu(MouseEvent e, int nbOptions) {
+        int distance = (int) e.getPoint().distance(firstPoint);
+        Point origin = new Point(firstPoint.x, firstPoint.y - MARKING_MENU_RAYON);
+        double angleSection = 360 / nbOptions;
+        double angle = angleBetweenTwoPointsWithFixedPoint(e.getX(), e.getY(), origin.x, origin.y, firstPoint.x, firstPoint.y);
+        angle = Math.toDegrees(angle);
+
+        if (distance < MARKING_MENU_RAYON && distance > DELAT_ERROR) {
+            if (angle < 0) {
+                angle += 360;
+            }
+            return (int) ((angle / angleSection) + 1);
+        } else {
+            return -1;
+        }
+    }
+
+    public static double angleBetweenTwoPointsWithFixedPoint(double point1X, double point1Y,
+            double point2X, double point2Y,
+            double fixedX, double fixedY) {
+
+        double angle1 = Math.atan2(point1Y - fixedY, point1X - fixedX);
+        double angle2 = Math.atan2(point2Y - fixedY, point2X - fixedX);
+
+        return angle1 - angle2;
+    }
+
+    private Color getRandomColor() {
+        Random r = new Random();
+        int rouge = r.nextInt(128);
+        int vert = r.nextInt(128);
+        int bleu = r.nextInt(128);
+
+        return new Color(rouge + 128, vert + 128, bleu + 128);
     }
 
 }

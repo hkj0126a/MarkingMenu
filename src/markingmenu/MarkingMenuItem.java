@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package markingmenu;
 
+import markingmenu.listener.MarkingMenuItemExtendListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -19,20 +15,30 @@ import java.awt.geom.Area;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * @author Nathan
+ * @author Jean-Luc
+ */
 public class MarkingMenuItem extends JPanel {
 
     private boolean fillProgress = false;
-    private double progress;
+    private boolean isMouseIn = false;
     private int position;
     private int nbOptionsTotal;
     private double angle;
+    private double progress;
+
     private Area area;
     private JLabel label;
     private Color color;
-    private boolean isMouseIn = false;
-    private MarkingMenuItemPrivateListener observer;
 
-    public MarkingMenuItem(Color c, int pos, int nbOptions, String _label, MarkingMenuItemPrivateListener obs) {
+    private MarkingMenuItemExtendListener observer;
+
+    public MarkingMenuItem() {
+        this(Color.CYAN, 1, 1, "default_item", null);
+    }
+
+    public MarkingMenuItem(Color c, int pos, int nbOptions, String _label, MarkingMenuItemExtendListener obs) {
         setOpaque(false);
         setForeground(Color.white);
         nbOptionsTotal = nbOptions;
@@ -43,37 +49,42 @@ public class MarkingMenuItem extends JPanel {
         initAngle();
         observer = obs;
         color = c;
-        
 
         add(label);
         setFillProgress(true);
+        initListener();
+    }
+
+    /**
+     * *****************************************************************************
+     *** INITIALIZATION METHODS
+     * ******************************************************************************
+     */
+    
+    
+    public void initListener() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                observer.actionMarkingMenuItemClicked(position,e);
+                if (observer != null) {
+                    observer.actionMarkingMenuItemClicked(position, e);
+                }
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                observer.actionMarkingMenuItemEntered(position,e);
+                if (observer != null) {
+                    observer.actionMarkingMenuItemEntered(position, e);
+                }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                observer.actionMarkingMenuItemExited(position,e);
+                if (observer != null) {
+                    observer.actionMarkingMenuItemExited(position, e);
+                }
             }
         });
-    }
-
-    public void setHighLight(boolean isHighLight) {
-        if(isHighLight) {
-            setForeground(color);
-            isMouseIn = true;
-        }
-        else {
-            setForeground(Color.white);
-            isMouseIn = false;
-        }
     }
 
     private void initAngle() {
@@ -82,6 +93,14 @@ public class MarkingMenuItem extends JPanel {
         angle *= position - 1;
     }
 
+    
+    /**
+     * *****************************************************************************
+     *** GETTER / SETTER METHODS
+     * ******************************************************************************
+     */
+    
+    
     private void setFillProgress(boolean value) {
         if (fillProgress != value) {
             this.fillProgress = value;
@@ -93,11 +112,6 @@ public class MarkingMenuItem extends JPanel {
         return fillProgress;
     }
 
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(200, 200);
-    }
-
     private void setProgress(double value) {
         if (progress != value) {
             double old = progress;
@@ -106,23 +120,41 @@ public class MarkingMenuItem extends JPanel {
             repaint();
         }
     }
-    
+
     public void setMouseIn(boolean in) {
         isMouseIn = in;
     }
-    
+
     public boolean isMouseIn() {
         return isMouseIn;
     }
 
+    public void setHighLight(boolean isHighLight) {
+        if (isHighLight) {
+            setForeground(color);
+            isMouseIn = true;
+        } else {
+            setForeground(Color.white);
+            isMouseIn = false;
+        }
+    }
+
+    
+    /**
+     * *****************************************************************************
+     *** COMPONENT OVERRIDE METHODS
+     * ******************************************************************************
+     */
+    
+    
     @Override
-    public String toString() {
-        return label.getText();
+    public Dimension getPreferredSize() {
+        return new Dimension(200, 200);
     }
 
     @Override
     public boolean contains(int x, int y) {
-        Point rotatedPoint = rotatePoint(new Point(x, y));
+        Point rotatedPoint = getNewPointAfterDefaultRotation(new Point(x, y));
         return area.contains(rotatedPoint.x, rotatedPoint.y);
     }
 
@@ -157,7 +189,6 @@ public class MarkingMenuItem extends JPanel {
         Arc2D arc = new Arc2D.Double();
         arc = null;
         if (isFillProgress()) {
-            //arc = new Arc2D.Double(x, y, raidus, 500, 90, -extent, Arc2D.OPEN);
             arc = new Arc2D.Double(x, y, raidus, raidus, 90, -extent, Arc2D.PIE);
         } else {
             extent = 360 - extent;
@@ -179,26 +210,37 @@ public class MarkingMenuItem extends JPanel {
         g2d.draw(area);
 
         g2d.dispose();
-        label.setLocation(computeLabelLocation());
+        label.setLocation(computeLabelLocationInItem());
     }
 
-    private Point computeLabelLocation() {
+    @Override
+    public String toString() {
+        return label.getText();
+    }
+
+    /**
+     * *****************************************************************************
+     *** COMPUTATION METHODS
+     * ******************************************************************************
+     */
+    
+    private Point computeLabelLocationInItem() {
         label.setForeground(Color.black);
 
         double x = getWidth() / 2;
         double y = getHeight() / 4 - label.getHeight() / 2;
 
-        Point intermediaire = rotatePoint(new Point((int) x, (int) y), -angle);
+        Point intermediaire = getNewPointAfterRotation(new Point((int) x, (int) y), -angle);
 
         double anglePart = (double) (2 * Math.PI / nbOptionsTotal);
-        Point presqueFinal = rotatePoint(intermediaire, -anglePart / 2);
+        Point locationPoint = getNewPointAfterRotation(intermediaire, -anglePart / 2);
 
-        presqueFinal.x -= label.getWidth() / 2;
-        presqueFinal.y -= label.getHeight() / 2;
-        return presqueFinal;
+        locationPoint.x -= label.getWidth() / 2;
+        locationPoint.y -= label.getHeight() / 2;
+        return locationPoint;
     }
 
-    private Point rotatePoint(Point p) {
+    private Point getNewPointAfterDefaultRotation(Point p) {
         Point center = new Point(getWidth() / 2, getHeight() / 2);
         int x = (int) (((p.x - center.x) * Math.cos(angle)) + ((p.y - center.y) * Math.sin(angle)));
         int y = (int) (((p.y - center.y) * Math.cos(angle)) - ((p.x - center.x) * Math.sin(angle)));
@@ -206,7 +248,7 @@ public class MarkingMenuItem extends JPanel {
         return rotatedPoint;
     }
 
-    private Point rotatePoint(Point p, double rotationAngle) {
+    private Point getNewPointAfterRotation(Point p, double rotationAngle) {
         Point center = new Point(getWidth() / 2, getHeight() / 2);
         int x = (int) (((p.x - center.x) * Math.cos(rotationAngle)) + ((p.y - center.y) * Math.sin(rotationAngle)));
         int y = (int) (((p.y - center.y) * Math.cos(rotationAngle)) - ((p.x - center.x) * Math.sin(rotationAngle)));
