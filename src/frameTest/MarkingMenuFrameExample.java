@@ -3,12 +3,12 @@ package frameTest;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import markingmenu.MarkingMenu;
+import markingmenu.MarkingMenuState;
 
 /**
  * @author Nathan
@@ -17,7 +17,6 @@ import markingmenu.MarkingMenu;
 public class MarkingMenuFrameExample extends javax.swing.JFrame {
 
     private static final int DELTA_MOVE_POSITION = 10;
-    private Point originPoint, draggedPoint;
     private MarkingMenu markingMenu;
 
     public MarkingMenuFrameExample() {
@@ -41,13 +40,13 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         positionLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                originPoint = new Point(e.getXOnScreen(), e.getYOnScreen());
                 positionLabelMousePressed(e);
                 markingMenu.mouseMarkingMenuPressed(e);
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                repaint();
                 markingMenu.mouseMarkingMenuReleased(e, 4);
             }
         });
@@ -55,7 +54,6 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         positionLabel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                draggedPoint = new Point(e.getXOnScreen(),e.getYOnScreen());
                 repaint();
                 markingMenu.mouseMarkingMenuDragged(e);
             }
@@ -72,14 +70,15 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                repaint();
                 markingMenu.mouseMarkingMenuReleased(e, 2);
             }
-
         });
 
         sizeLabel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                repaint();
                 markingMenu.mouseMarkingMenuDragged(e);
             }
         });
@@ -95,6 +94,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                repaint();
                 markingMenu.mouseMarkingMenuReleased(e, 8);
             }
         });
@@ -102,6 +102,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         colorLabel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                repaint();
                 markingMenu.mouseMarkingMenuDragged(e);
             }
         });
@@ -117,6 +118,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                repaint();
                 markingMenu.mouseMarkingMenuReleased(e, 4);
             }
         });
@@ -124,6 +126,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         textLabel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                repaint();
                 markingMenu.mouseMarkingMenuDragged(e);
             }
         });
@@ -291,18 +294,36 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
 
     @Override
     public void paint(Graphics g) {
-        
-        if(originPoint != null && draggedPoint!= null) {
-            System.out.println("DRAGGED "+draggedPoint.getX());
-            g.setColor(Color.red);
-            g.drawLine((int)originPoint.getX(), (int)originPoint.getY(), (int)draggedPoint.getX(), (int)draggedPoint.getY());
-        }
-        g.drawRect(10, 10, 400, 400);
-        super.paint(g); //To change body of generated methods, choose Tools | Templates.
 
+        if (markingMenu.getOriginPoint() != null && markingMenu.getDraggedPoint() != null
+                && markingMenu.getLastDraggedPoint() != null && markingMenu.getState() == MarkingMenuState.INVISIBLE) {
+            if (markingMenu.isEraseRubberBanding()) {
+                g.drawLine((int) markingMenu.getOriginPoint().getX(), (int) markingMenu.getOriginPoint().getY(),
+                        (int) markingMenu.getDraggedPoint().getX(), (int) markingMenu.getDraggedPoint().getY());
+                markingMenu.setEraseRubberBanding(false);
+            } else {
+
+                //on efface l'ancienne ligne du drag
+                g.setColor(jPanel1.getBackground());
+                g.drawLine((int) markingMenu.getOriginPoint().getX(), (int) markingMenu.getOriginPoint().getY(),
+                        (int) markingMenu.getLastDraggedPoint().getX(), (int) markingMenu.getLastDraggedPoint().getY());
+
+                //on dessine la nouvelle ligne
+                g.setColor(Color.red);
+                g.drawLine((int) markingMenu.getOriginPoint().getX(), (int) markingMenu.getOriginPoint().getY(),
+                        (int) markingMenu.getDraggedPoint().getX(), (int) markingMenu.getDraggedPoint().getY());
+
+                positionLabel.repaint();
+                sizeLabel.repaint();
+                textLabel.repaint();
+                testLabel.repaint();
+                colorLabel.repaint();
+                jLabel1.repaint();
+            }
+        } else {
+            super.paint(g);
+        }
     }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -313,6 +334,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         sizeLabel = new javax.swing.JLabel();
         colorLabel = new javax.swing.JLabel();
         positionLabel = new javax.swing.JLabel();
@@ -321,6 +343,9 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
         sizeLabel.setFont(new java.awt.Font("Segoe UI Light", 0, 24)); // NOI18N
         sizeLabel.setText("Taille");
@@ -340,47 +365,58 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI Light", 0, 18)); // NOI18N
         jLabel1.setText("Veuillez faire un clic droit sur un des labels suivants : Taille, Couleur, Position, Texte");
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(61, 61, 61)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel1)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGap(27, 27, 27)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(sizeLabel)
+                                .addComponent(positionLabel))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(colorLabel)
+                                .addComponent(textLabel))
+                            .addGap(27, 27, 27)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(229, 229, 229)
+                        .addComponent(testLabel)
+                        .addGap(272, 272, 272)))
+                .addGap(74, 74, 74))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addComponent(jLabel1)
+                .addGap(79, 79, 79)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sizeLabel)
+                    .addComponent(colorLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(testLabel)
+                .addGap(126, 126, 126)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(positionLabel)
+                    .addComponent(textLabel))
+                .addGap(52, 52, 52))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(67, 67, 67)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel1)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(27, 27, 27)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(sizeLabel)
-                                .addComponent(positionLabel))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(colorLabel)
-                                .addComponent(textLabel))
-                            .addGap(27, 27, 27)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(229, 229, 229)
-                        .addComponent(testLabel)
-                        .addGap(272, 272, 272)))
-                .addGap(68, 68, 68))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(56, 56, 56)
-                .addComponent(jLabel1)
-                .addGap(79, 79, 79)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sizeLabel)
-                    .addComponent(colorLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 112, Short.MAX_VALUE)
-                .addComponent(testLabel)
-                .addGap(126, 126, 126)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(positionLabel)
-                    .addComponent(textLabel))
-                .addGap(56, 56, 56))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -425,6 +461,7 @@ public class MarkingMenuFrameExample extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel colorLabel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel positionLabel;
     private javax.swing.JLabel sizeLabel;
     private javax.swing.JLabel testLabel;

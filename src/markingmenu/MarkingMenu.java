@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.Timer;
+import markingmenu.popup.TranslucentPopupFactory;
 
 /**
  * @author Nathan
@@ -29,9 +30,10 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
     private List<MarkingMenuItem> items;
     private List<String> labelOptions;
     private MarkingMenuItemListener observers;
-    private Point firstPoint;
     private final static int MARKING_MENU_RAYON = 100;
     private final static int DELAT_ERROR = 30;
+    private Point originPoint, draggedPoint,lastDraggedPoint;
+    private boolean eraseRubberBanding = false;
 
     /**
      * Creates new form Pie
@@ -42,10 +44,9 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
 
     public MarkingMenu(List<String> label) {
         initComponents();
-
-        firstPoint = new Point(0, 0);
         items = new ArrayList();
         observers = null;
+        
         timer = new Timer(1000, (ActionEvent e) -> {
             timerListner();
         });
@@ -82,8 +83,10 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
 
     }
 
-    public void initFactory(int posX, int posY) {
-        PopupFactory factory = PopupFactory.getSharedInstance();
+    private void initFactory(int posX, int posY) {
+        PopupFactory factory /*= TranslucentPopupFactory.getSharedInstance()*/;
+        PopupFactory.setSharedInstance(new TranslucentPopupFactory());
+        factory = PopupFactory.getSharedInstance();
         int x = posX - (getPreferredSize().width / 2);
         int y = posY - (getPreferredSize().height / 2);
 
@@ -138,31 +141,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-    /**
-     * *****************************************************************************
-     *** GETTER / SETTER METHODS
-     * ******************************************************************************
-     */
-    public MarkingMenuState getState() {
-        return state;
-    }
 
-    public String getLabel(int numOption) {
-        return labelOptions.get(numOption);
-    }
-
-    public List<String> getLabelOptions() {
-        return labelOptions;
-    }
-
-    public void setListActions(List<String> label, int posX, int posY) {
-        initMarkingMenu(label);
-        initFactory(posX, posY);
-    }
-
-    public List<MarkingMenuItem> getItems() {
-        return items;
-    }
 
     /**
      * *****************************************************************************
@@ -205,14 +184,14 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
                     hide();
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
                     state = MarkingMenuState.MARKING;
-                    firstPoint.setLocation(e.getX(), e.getY());
+                    originPoint = new Point(e.getXOnScreen(), e.getYOnScreen());
                     timer.start();
                 }
 
                 break;
             case IDLE:
                 state = MarkingMenuState.MARKING;
-                firstPoint.setLocation(e.getX(), e.getY());
+                originPoint = new Point(e.getXOnScreen(), e.getYOnScreen());
                 timer.start();
                 break;
             case MARKING:
@@ -251,14 +230,16 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
                 }
                 break;
             case INVISIBLE:
-                if (computeIsInInvisibleMenu(e, nbOptions) != -1) {
+                if (computeIsInInvisibleMenu(nbOptions) != -1) {
                     state = MarkingMenuState.IDLE;
-                    fireObserversForItemAction(computeIsInInvisibleMenu(e, nbOptions));
+                    fireObserversForItemAction(computeIsInInvisibleMenu(nbOptions));
                     hide();
                 } else {
                     state = MarkingMenuState.IDLE;
                     hide();
                 }
+                lastDraggedPoint = null;
+                setEraseRubberBanding(true);
                 break;
         }
     }
@@ -279,6 +260,8 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
                 //INTERDIT
                 break;
             case INVISIBLE:
+                setLastDraggedPoint(getDraggedPoint());
+                setDraggedPoint(new Point(e.getXOnScreen(), e.getYOnScreen()));
                 state = MarkingMenuState.INVISIBLE;
                 //do nothing
                 break;
@@ -371,11 +354,11 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
         return false;
     }
 
-    private int computeIsInInvisibleMenu(MouseEvent e, int nbOptions) {
-        int distance = (int) e.getPoint().distance(firstPoint);
-        Point origin = new Point(firstPoint.x, firstPoint.y - MARKING_MENU_RAYON);
+    private int computeIsInInvisibleMenu( int nbOptions) {
+        int distance = (int) draggedPoint.distance(originPoint);
+        Point originRepere = new Point(originPoint.x, originPoint.y - MARKING_MENU_RAYON);
         double angleSection = 360 / nbOptions;
-        double angle = angleBetweenTwoPointsWithFixedPoint(e.getX(), e.getY(), origin.x, origin.y, firstPoint.x, firstPoint.y);
+        double angle = angleBetweenTwoPointsWithFixedPoint(draggedPoint.getX(), draggedPoint.getY(), originRepere.x, originRepere.y, originPoint.x, originPoint.y);
         angle = Math.toDegrees(angle);
 
         if (distance < MARKING_MENU_RAYON && distance > DELAT_ERROR) {
@@ -388,7 +371,7 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
         }
     }
 
-    public static double angleBetweenTwoPointsWithFixedPoint(double point1X, double point1Y,
+    private static double angleBetweenTwoPointsWithFixedPoint(double point1X, double point1Y,
             double point2X, double point2Y,
             double fixedX, double fixedY) {
 
@@ -405,6 +388,88 @@ public class MarkingMenu extends javax.swing.JPanel implements MarkingMenuItemEx
         int bleu = r.nextInt(128);
 
         return new Color(rouge + 128, vert + 128, bleu + 128);
+    }
+
+    /**
+     * *****************************************************************************
+     *** GETTER / SETTER METHODS
+     * ******************************************************************************
+     */
+    public MarkingMenuState getState() {
+        return state;
+    }
+
+    public String getLabel(int numOption) {
+        return labelOptions.get(numOption);
+    }
+
+    public List<String> getLabelOptions() {
+        return labelOptions;
+    }
+
+    public void setListActions(List<String> label, int posX, int posY) {
+        initMarkingMenu(label);
+        initFactory(posX, posY);
+    }
+
+    public List<MarkingMenuItem> getItems() {
+        return items;
+    }
+    
+    /**
+     * @return the originPoint
+     */
+    public Point getOriginPoint() {
+        return originPoint;
+    }
+
+    /**
+     * @param originPoint the originPoint to set
+     */
+    public void setOriginPoint(Point originPoint) {
+        this.originPoint = originPoint;
+    }
+
+    /**
+     * @return the draggedPoint
+     */
+    public Point getDraggedPoint() {
+        return draggedPoint;
+    }
+
+    /**
+     * @param draggedPoint the draggedPoint to set
+     */
+    public void setDraggedPoint(Point draggedPoint) {
+        this.draggedPoint = draggedPoint;
+    }
+
+    /**
+     * @return the lastDraggedPoint
+     */
+    public Point getLastDraggedPoint() {
+        return lastDraggedPoint;
+    }
+
+    /**
+     * @param lastDraggedPoint the lastDraggedPoint to set
+     */
+    public void setLastDraggedPoint(Point lastDraggedPoint) {
+        this.lastDraggedPoint = lastDraggedPoint;
+    }
+
+    /**
+     * @return the eraseRubberBanding
+     */
+    public boolean isEraseRubberBanding() {
+        return eraseRubberBanding;
+    }
+
+    /**
+     * @param eraseRubberBanding the eraseRubberBanding to set
+     */
+    public void setEraseRubberBanding(boolean eraseRubberBanding) {
+        this.eraseRubberBanding = eraseRubberBanding;
     }
 
 }
